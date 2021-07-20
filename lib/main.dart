@@ -1,7 +1,6 @@
 import 'package:del_phonebook/screens/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:del_phonebook/screens/phonebook.dart';
-import 'package:del_phonebook/screens/auth.dart';
 
 void main() {
   runApp(MyApp());

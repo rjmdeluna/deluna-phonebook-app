@@ -161,7 +161,7 @@ class _UpdateContactsState extends State<UpdateContacts> {
           TextFormField(
             controller: _firstnameController,
             decoration: InputDecoration(
-              hintText: 'Enter Last Name',
+              hintText: 'Enter First Name',
               prefixIcon: Icon(
                 Icons.account_circle,
                 size: 30,
