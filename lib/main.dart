@@ -1,6 +1,9 @@
-import 'package:del_phonebook/screens/auth.dart';
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:del_phonebook/screens/phonebook.dart';
+import 'package:del_phonebook/auth.dart'
+    show AuthPage, LoginSection, SignupSection;
 
 void main() {
   runApp(MyApp());
@@ -17,6 +20,14 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.green[800],
           accentColor: Colors.lightGreen[900],
         ),
-        home: AuthPage());
+        home: AuthPage(),
+        routes: <String, WidgetBuilder>{
+          Contacts.id: (context) => Contacts(),
+          LoginSection.id: (context) => LoginSection(),
+          SignupSection.id: (context) => SignupSection(),
+          '/contacts': (BuildContext context) => new Contacts(),
+          'Log in': (BuildContext context) => new LoginSection(),
+          'Sign up': (BuildContext context) => new SignupSection(),
+        });
   }
 }

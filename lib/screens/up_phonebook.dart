@@ -12,8 +12,8 @@ class ContactData {
 }
 
 Future<SpecificContact> fetchSpecificContact(String id) async {
-  final response = await http
-      .get(Uri.parse('https://del-heroku-api.herokuapp.com/posts/get/' + id));
+  final response = await http.get(
+      Uri.parse('https://deluna-upheroku-api.herokuapp.com/posts/get/' + id));
   print('Status [Success]: Got the ID [$id]');
   if (response.statusCode == 200) {
     print('Status [Success]: Specific Data Appended');
@@ -334,8 +334,8 @@ class CheckScreen extends StatelessWidget {
     Future<http.Response> createContact(
         String fname, String lname, List pnums) {
       return http.patch(
-        Uri.parse(
-            'https://del-heroku-api.herokuapp.com/posts/update/' + specificID),
+        Uri.parse('https://deluna-upheroku-api.herokuapp.com/posts/update/' +
+            specificID),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

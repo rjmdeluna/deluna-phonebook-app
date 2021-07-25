@@ -1,29 +1,56 @@
 import 'dart:convert';
-import 'package:del_phonebook/screens/up_phonebook.dart';
 import 'package:flutter/material.dart';
-import 'package:del_phonebook/screens/add_contacts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:del_phonebook/screens/phonebook.dart';
+import 'package:del_phonebook/auth.dart'
+    show AuthPage, LoginSection, SignupSection;
+
+import 'add_contacts.dart';
+import 'package:del_phonebook/screens/up_phonebook.dart';
 
 class Contacts extends StatefulWidget {
-  static var id;
-
+  static const String id = "Contacts";
   @override
   _ContactsState createState() => _ContactsState();
 }
 
 class _ContactsState extends State<Contacts> {
   List users = [];
-
+  late String authKey = '';
+  var authHeaders;
   @override
   void initState() {
     super.initState();
-    this.fetchUser();
+    getAuth();
   }
 
-  final String apiUrlget = "https://del-heroku-api.herokuapp.com/posts/";
+  Future getAuth() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var getAuthKey = sharedPreferences.getString('token');
+    print(getAuthKey);
+    setState(
+      () {
+        if (getAuthKey != null) {
+          authKey = getAuthKey;
+          authHeaders = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'AUTHENTICATE': authKey.toString(),
+          };
+          fetchUser(authHeaders);
+        }
+      },
+    );
+  }
+
+  final String apiUrlget = "https://deluna-upheroku-api.herokuapp.com/posts/";
   List<dynamic> _users = [];
-  fetchUser() async {
-    var result = await http.get(Uri.parse(apiUrlget));
+  fetchUser(var authHeaders) async {
+    print(authHeaders);
+    var result = await http.get(Uri.parse(apiUrlget), headers: authHeaders);
     setState(() {
       _users = jsonDecode(result.body);
     });
@@ -42,7 +69,13 @@ class _ContactsState extends State<Contacts> {
   Future<http.Response> deleteContact(String id) {
     print("Status [Deleted]: [" + id + "]");
     return http.delete(
-        Uri.parse('https://del-heroku-api.herokuapp.com/posts/delete/' + id));
+      Uri.parse('https://deluna-upheroku-api.herokuapp.com/posts/delete/' + id),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'AUTHENTICATE': authKey.toString()
+      },
+    );
   }
 
   @override
@@ -50,6 +83,20 @@ class _ContactsState extends State<Contacts> {
     return Scaffold(
       appBar: AppBar(
         title: Text("My Phonebook"),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
+              preferences.remove("token");
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuthPage()),
+                  (_) => false);
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
       ),
       body: Container(
         child: FutureBuilder<List<dynamic>>(
@@ -293,11 +340,19 @@ class _ContactsState extends State<Contacts> {
         child: Icon(Icons.add, color: Colors.white),
       ),
     );
+    FlatButton.icon(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return LoginSection();
+          }));
+        },
+        icon: Icon(Icons.save),
+        label: Text("Logout"));
   }
 
   Future<void> _getData() async {
     setState(() {
-      fetchUser();
+      getAuth();
     });
   }
 }
